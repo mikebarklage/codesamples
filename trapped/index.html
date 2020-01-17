@@ -1,0 +1,170 @@
+<!--    REACT/PHP CODE SAMPLE
+        by Michael Barklage, Jan 2020       -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="robots" content="noindex">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Hey, My Brain is Trapped in a Computer!</title>
+	
+	<!-- My web host doesn't allow NodeJS/npm/npx, so include ReactJS here -->
+	<script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+	<script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+	<script type="application/javascript" src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+	<script type="application/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	
+	<!-- Load reCaptcha API -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	
+	<link rel="stylesheet" type="text/css" href="trapped.css">
+
+	<script type="text/babel">
+		const rootElement = document.getElementById('root');
+		
+		class Trapped extends React.Component { 
+		
+			// form state
+			constructor(props) {
+				super(props);
+				this.state = {
+					yname: '',
+					email: '',
+					causes: [],
+					otext: '',
+					message: '',
+					mailSent: false,
+					error: null
+				}
+
+				this.handleCheckboxes = this.handleCheckboxes.bind(this);
+			}
+			
+			handleFormSubmit = e => {
+				e.preventDefault();
+
+				// Validate form data before sending
+				if ((this.state['yname'] == '') || (this.state['email'] == '')) return false;
+				if (!document.getElementById('email').validity.valid) return false;
+				if (grecaptcha.getResponse() == 0) {
+					alert("Please prove you're not a robot without a human brain.");
+					return false;
+				}
+			  
+				// use axios to call the PHP that sends the email
+				axios({
+					method: 'post',
+					url: 'trapped_email.php',
+					headers: { 'content-type': 'application/json' },
+					data: this.state
+				})
+				.then(result => {
+					this.setState({ mailSent: result.data.sent });
+					alert("Mail sent!");
+					// disable submit button to prevent multiple emails
+					document.getElementById("submit").disabled = true;
+				})
+				.catch(error => {
+					this.setState({ error: error.message });
+					alert("Mail not sent, error: "+error.message);
+				});
+				
+			}
+			
+			// every time a checkbox is clicked, update the causes array
+			handleCheckboxes(e) {
+				var checkboxes = document.getElementsByName('cause');
+				var checked = [];
+				for (var i = 0; i < checkboxes.length; i++) {
+					if (checkboxes[i].checked) { checked.push(checkboxes[i].value); }
+				}
+				this.setState({ causes: checked });
+			}
+			
+			render() { 
+			
+				return (
+				<div className="Trapped">
+					<p id="logo">Hey, My Brain is Trapped in a Computer!</p>
+					<div id="theme_song">
+						<audio controls>
+							<source src="trapped.mp3" type="audio/mpeg"/>
+							Your browser does not support the audio element.
+						</audio> 
+					</div>
+					<div id="description">
+						Is your brain trapped in a computer? Notify the important people in your life
+						by using the form below!
+					</div>
+					<div id="email_div">
+						<form action="#" id="email_form">
+						<label>Your Name:</label>
+						  <input type="text" id="yname" name="yourname" required
+							value={this.state.yourname}
+							onChange={e => this.setState({ yname: e.target.value })}
+						  />
+						  
+						  <label>Recipient's Email:</label>
+						  <input type="email" id="email" name="email" required 
+							value={this.state.email}
+							onChange={e => this.setState({ email: e.target.value })}
+						  />
+						  
+						  <label>Cause(s) - select all that apply:</label>
+						  <input type="checkbox" name="cause" id="electrocution" value="Electrocution" onClick={this.handleCheckboxes} /> Electrocution<br/>
+						  <input type="checkbox" name="cause" id="sorcery" value="Sorcery" onClick={this.handleCheckboxes} /> Sorcery<br/>
+						  <input type="checkbox" name="cause" id="madscience" value="Mad Science" onClick={this.handleCheckboxes} /> Mad Science<br/>
+						  <input type="checkbox" name="cause" id="wackyscience" value="Wacky Science" onClick={this.handleCheckboxes} /> Wacky Science<br/>
+						  <input type="checkbox" name="cause" id="teleporter" value="Teleporter Accident" onClick={this.handleCheckboxes} /> Teleporter Accident<br/>
+						  <input type="checkbox" name="cause" id="sentientai" value="Sentient AI" onClick={this.handleCheckboxes} /> Sentient AI<br/>
+						  <input type="checkbox" name="cause" id="aliens" value="Aliens" onClick={this.handleCheckboxes} /> Aliens<br/>
+						  <input type="checkbox" name="cause" id="other" value="Other" onClick={this.handleCheckboxes} /> Other:
+								<input type="text" id="otext" name="othertext" placeholder="(max 50 chars)" maxlength="50" 
+									value={this.state.othertext}
+									onChange={e => this.setState({ otext: e.target.value })}
+								/>
+						  
+						  <label>Message (optional):</label>
+						  <textarea id="message" name="message" placeholder="(max 1000 chars)" maxlength="1000" 
+							onChange={e => this.setState({ message: e.target.value })}
+							value={this.state.message}
+						  ></textarea>
+						  
+						  <label>Are you a robot that does NOT contain a human brain?</label>
+						  <div class="g-recaptcha" data-sitekey="6LdNo80UAAAAAGDgV1vIYNl-i3A5alOFvvVpkO44"></div>
+						  
+						  <input type="submit" id="submit" onClick={e => this.handleFormSubmit(e)} value="Submit" />
+						</form>
+					</div>
+					<div id="footer">* Theme song and idea courtesy of Elliott Kalan/The Flop House</div>
+				</div>
+				);
+			}
+		}
+		
+		function Trapped(){
+		  return(
+		  <div>
+			<Trapped name="trapped_app"/>
+		  </div>
+		  )
+		}
+
+		// place the Trapped form in the root div
+		ReactDOM.render(
+		  <Trapped />,
+		  rootElement
+		)
+	</script>
+
+</head>
+
+<body>
+  <div id="root"></div>
+
+</body>
+
+</html>
