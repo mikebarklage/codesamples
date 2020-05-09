@@ -1,0 +1,6 @@
+By Mike Barklage
+www.mikebarklage.com
+
+- You MUST update covid-maps-config.js with your own Google Charts API key!
+
+- In the same file, you can change the number of weeks ago to compare against current data. I chose 2 weeks because it seems to be a "generation" in terms of viral spread - ie, changes to a lockdown status take about 2 weeks to show up in the data.
