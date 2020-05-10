@@ -14,7 +14,7 @@ h1 {
 
 .map_tab {
 	float: left;
-	width: 30%;
+	width: 35%;
 	border-style: solid;
 	border-width: 1px;
 	border-color: black;
@@ -37,4 +37,13 @@ h1 {
 	font-style: italic;
 	padding-top: 20px;
 	padding-bottom: 20px;
+}
+
+@media screen and (max-width: 600px) {
+	h1 {
+		font-size: 14px;
+	}
+	.map_tab {
+		font-size: 10px;
+	}
 }
