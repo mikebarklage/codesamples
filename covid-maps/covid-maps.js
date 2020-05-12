@@ -134,7 +134,8 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	var options = { 
 		region: 'US',
 		resolution: 'provinces',
-		colorAxis: colorAxisObject
+		colorAxis: colorAxisObject,
+		legend: 'none'
 	};
 	var chart = new google.visualization.GeoChart(document.getElementById('map_display'));
 	chart.draw(chartData, options);
