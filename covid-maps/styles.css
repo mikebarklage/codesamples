@@ -5,10 +5,12 @@ body {
 
 h1 {
 	font-size: 24px;
+	padding-left: 20%;
 }
 
 #map_tab_container {
 	padding-left: 20%;
+	padding-right: 20%;
 	padding-bottom: 25px;
 }
 
@@ -39,9 +41,10 @@ h1 {
 	padding-bottom: 20px;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 650px) {
 	h1 {
 		font-size: 11px;
+		padding-left: 10%;
 	}
 	.map_tab {
 		font-size: 8px;
