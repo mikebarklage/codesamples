@@ -123,7 +123,7 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	
 	if (whichMap == 'totalCases') {
 		// total cases
-		var colorAxisObject = {minValue: 0, maxValue: 200, colors: ['white', 'red']};
+		var colorAxisObject = {minValue: 0, maxValue: 150, colors: ['white', 'red']};
 	}
 	else {
 		// positive rate - pin values to +/- 5% shifts because of negative test dumping (like NJ 5/12/2020)
