@@ -1,0 +1,17 @@
+{
+    "name": "hanisko/php-exercise",
+    "type": "project",
+    "description": "PHP coding exercise",
+    "require": {
+        "php": "^7.2",
+        "phpunit/phpunit": "^9.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        },
+        "classmap": [
+            "tests/rigging"
+        ]
+    }
+}
