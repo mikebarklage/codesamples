@@ -6,11 +6,11 @@ function initializeCovidMaps() {
 	// get the raw data
 	$.get(url, function (data) {
 	
-		// "current" date is yesterday, in case today's data isn't up yet
-		var thisWeekDate = new Date.today().addDays(-1);
+		var thisWeekDate = new Date.today();
+		var lastWeekDate = new Date.today().addWeeks(-1 * weeksBack);
 		
 		// transform the data into something useful - 3rd parameter is how many weeks to look back
-		finalCaseDataArray = parseCovidCaseData(data, thisWeekDate, (-1 * weeksBack));
+		finalCaseDataArray = parseCovidCaseData(data, thisWeekDate, lastWeekDate);
 		
 		drawCovidMaps(finalCaseDataArray, 'totalCases');
 		
@@ -18,11 +18,23 @@ function initializeCovidMaps() {
 	
 }
 
-function parseCovidCaseData(data, thisDate, weeks) {
+function parseCovidCaseData(data, currentDate, previousDate) {
 	
 	// put current and past dates into string format
-	var currentDate = thisDate.toString("yyyyMMdd");
-	var previousDate = thisDate.addWeeks(weeks).toString("yyyyMMdd");
+	//var currentDate = thisDate.toString("yyyyMMdd");
+	//var previousDate = thisDate.addWeeks(weeks).toString("yyyyMMdd");
+	
+	var currentDateArray = new Array();
+	for (var x = 0; x <= 6; x++) {
+		currentDateArray[x] = currentDate.addDays(-1).toString("yyyyMMdd");
+	}
+	var previousDateArray = new Array();
+	for (var x = 0; x <= 6; x++) {
+		previousDateArray[x] = previousDate.addDays(-1).toString("yyyyMMdd");
+	}
+	var stopDate = previousDate.addDays(-1).toString("yyyyMMdd");
+	
+	
 	// exclude some states that don't appear on the maps
 	var excludeStates = ['AS', 'GU', 'MP', 'PR', 'VI', 'DC'];
 	
@@ -31,42 +43,45 @@ function parseCovidCaseData(data, thisDate, weeks) {
 	// loop through the raw data
 	jQuery.each(data, function(i, val) {
 		
-		// build current data
-		if (currentDate == val.date.toString()) {
+		if ((currentDateArray.includes(val.date.toString())) || (previousDateArray.includes(val.date.toString()))) {
 			
 			if (!(excludeStates.includes(val.state))) {
 				// if our transformed dataset doesn't include this state, add it
 				if (typeof(caseData[val.state]) == 'undefined') {
 					caseData[val.state] = {};
+					caseData[val.state]['thisWeekCaseTotal'] = 0;
+					caseData[val.state]['lastWeekCaseTotal'] = 0;
 				}
 				
 				// add current data
-				caseData[val.state]['thisWeekCaseTotal'] = val.positive;
-				caseData[val.state]['thisWeekTestTotal'] = val.totalTestResults;
+				if (currentDateArray.includes(val.date.toString())) {
+					// sum of a week's worth of data
+					caseData[val.state]['thisWeekCaseTotal'] += val.positiveIncrease;
+				}
+				if (currentDateArray[0] == val.date.toString()) {
+					// cumulative totals on this day
+					caseData[val.state]['thisWeekCaseOneDay'] = val.positive;
+					caseData[val.state]['thisWeekTestOneDay'] = val.totalTestResults;
+				}
 				
+				// add past data
+				if (previousDateArray.includes(val.date.toString())) {
+					// sum of a week's worth of data
+					caseData[val.state]['lastWeekCaseTotal'] += val.positiveIncrease;
+				}
+				if (previousDateArray[0] == val.date.toString()) {
+					// cumulative totals on this day
+					caseData[val.state]['lastWeekCaseOneDay'] = val.positive;
+					caseData[val.state]['lastWeekTestOneDay'] = val.totalTestResults;
+				}
+					
 			}
 			
 		}
 		
-		// build past data
-		if (previousDate == val.date.toString()) {
-			
-			if (!(excludeStates.includes(val.state))) {
-				// if our transformed dataset doesn't include this state, add it
-				if (typeof(caseData[val.state]) == 'undefined') {
-					caseData[val.state] = {};
-				}
-				
-				// add past data
-				caseData[val.state]['lastWeekCaseTotal'] = val.positive;
-				caseData[val.state]['lastWeekTestTotal'] = val.totalTestResults;
-				
-			}
-			
-			// no reason to parse the entire JSON dataset prior to previousDate - WY is the always last state, so bail
-			if (val.state.toString == "WY") { return false; }
-			
-		}
+		// once we hit the earliest date, stop looping thru data - better performance
+		if (stopDate == val.date.toString()) { return false; }
+		
 	});
 
 	// final data transformation
@@ -76,36 +91,48 @@ function parseCovidCaseData(data, thisDate, weeks) {
 	var customTooltip;
 	
 	var output = {};
-	output['totalCases'] = Array();
-	output['positiveRate'] = Array();
+	output['totalCases'] = new Array();
+	output['positiveRate'] = new Array();
 	
 	// first object value is always column headers, including custom text for tooltips (data that pops up on hover/click)
 	output['totalCases'].push(['State', 'Case Trend', {type: 'string', role: 'tooltip'}]);
 	output['positiveRate'].push(['State', 'Positive Test Rate Trend', {type: 'string', role: 'tooltip'}]);
 	
-	// loop through dataset created above - i is state, val is data values
+	// loop through dataset created above - i is US state, val is data values
 	jQuery.each(caseData, function(i, val) {
 		
-		// doublecheck that we are never dividing by zero
+		// TOTAL CASES - doublecheck that we are never dividing by zero
 		if (val.lastWeekCaseTotal > 0) {
-			// calculate percentage difference in case totals, limit to 2 decimal points
-			thisValue = parseFloat((((val.thisWeekCaseTotal - val.lastWeekCaseTotal) / val.lastWeekCaseTotal) * 100).toFixed(2));
-			// create useful tooltip text - add commas to numbers >= 1000
-			customTooltip = "Total Cases\nThen: "+val.lastWeekCaseTotal.toLocaleString()+"\nNow: "+val.thisWeekCaseTotal.toLocaleString()+"\nChange: "+thisValue+"%";
-			// add to google geochart dataset
-			output['totalCases'].push([i, thisValue, customTooltip]);
+			
+			// low case counts in either week make for huge variance in trends, so make 50 cases/week the cutoff
+			if ((val.thisWeekCaseTotal >= 50) && (val.lastWeekCaseTotal >= 50)) {
+				
+				// calculate percentage difference in case totals, limit to 2 decimal points
+				thisValue = parseFloat((((val.thisWeekCaseTotal - val.lastWeekCaseTotal) / val.lastWeekCaseTotal) * 100).toFixed(2));
+				
+				// create useful tooltip text - add commas to numbers >= 1000
+				customTooltip = "Total Cases\nThen: "+val.lastWeekCaseTotal.toLocaleString()+" /week\nNow: "+val.thisWeekCaseTotal.toLocaleString()+" /week\nChange: "+thisValue+"%";
+				
+				// add to google geochart dataset
+				output['totalCases'].push([i, thisValue, customTooltip]);
+				
+			}
 		}
 		
-		// doublecheck that we are never dividing by zero
-		if (val.lastWeekTestTotal > 0) {
+		// POSITIVE RATE - doublecheck that we are never dividing by zero
+		if ((val.thisWeekTestOneDay > 0) && (val.lastWeekTestOneDay > 0)) {
+			
 			// calculate percentage difference in positive test rates, limit to 2 decimal points
-			thisWeekRate = ((val.thisWeekCaseTotal / val.thisWeekTestTotal) * 100);
-			lastWeekRate = ((val.lastWeekCaseTotal / val.lastWeekTestTotal) * 100);
+			thisWeekRate = ((val.thisWeekCaseOneDay / val.thisWeekTestOneDay) * 100);
+			lastWeekRate = ((val.lastWeekCaseOneDay / val.lastWeekTestOneDay) * 100);
 			thisValue = parseFloat((thisWeekRate - lastWeekRate).toFixed(2));
+			
 			// create useful tooltip text
 			customTooltip = "Positive Test Rate\nThen: "+lastWeekRate.toFixed(2)+"%\nNow: "+thisWeekRate.toFixed(2)+"%\nChange: "+thisValue+"%";
+			
 			// add to google geochart dataset
 			output['positiveRate'].push([i, thisValue, customTooltip]);
+			
 		}
 		
 	});
@@ -123,11 +150,11 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	
 	if (whichMap == 'totalCases') {
 		// total cases
-		var colorAxisObject = {minValue: 0, maxValue: 150, colors: ['white', 'red']};
+		var colorAxisObject = {minValue: -100, maxValue: 100, colors: ['green', 'yellow', 'red']};
 	}
 	else {
-		// positive rate - pin values to +/- 5% shifts because of negative test dumping (like NJ 5/12/2020)
-		var colorAxisObject = {minValue: -5, maxValue: 5, colors: ['green', 'yellow', 'red']};
+		// positive rate
+		var colorAxisObject = {minValue: -3, maxValue: 3, colors: ['green', 'yellow', 'red']};
 	}
 
 	// create map
