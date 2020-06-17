@@ -4,3 +4,9 @@ www.mikebarklage.com
 - You MUST update covid-maps-config.js with your own Google Charts API key!
 
 - In the same file, you can change the number of weeks ago to compare against current data. I chose 2 weeks because it seems to be a "generation" in terms of viral spread - ie, changes to a lockdown status take about 2 weeks to show up in the data.
+
+6/16/2020 UPDATE:
+
+I originally compared total cumulative case counts to calculate the % increase for each state, but as time went on, I realized it would only capture 1st waves, not subsequent waves or states with a previously high number of cases.
+
+So I changed Total Cases to Weekly Cases and compared 7-day counts, now and X weeks ago. Since the % change can now be negative, I changed the white->red color system to green->yellow->red, like a stoplight. I also removed states where either weekly count is below 50 - with that few cases, any trend is statistical noise.
