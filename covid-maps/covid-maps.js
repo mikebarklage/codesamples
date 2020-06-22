@@ -154,7 +154,7 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	}
 	else {
 		// positive rate
-		var colorAxisObject = {minValue: -3, maxValue: 3, colors: ['green', 'yellow', 'red']};
+		var colorAxisObject = {minValue: -2, maxValue: 2, colors: ['green', 'yellow', 'red']};
 	}
 
 	// create map
