@@ -149,11 +149,11 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	var chartData = google.visualization.arrayToDataTable(finalCaseDataArray[whichMap]);
 	
 	if (whichMap == 'totalCases') {
-		// total cases
-		var colorAxisObject = {minValue: -100, maxValue: 100, colors: ['green', 'yellow', 'red']};
+		// total cases - [-75%, 0%, +75%, 150%] pinned to [green, yellow, orange, red]
+		var colorAxisObject = {minValue: -75, maxValue: 150, colors: ['green', 'yellow', 'orange', 'red']};
 	}
 	else {
-		// positive rate
+		// positive rate - [-2%, 0%, +2%] pinned to [green, yellow, red]
 		var colorAxisObject = {minValue: -2, maxValue: 2, colors: ['green', 'yellow', 'red']};
 	}
 
@@ -161,8 +161,7 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	var options = { 
 		region: 'US',
 		resolution: 'provinces',
-		colorAxis: colorAxisObject,
-		legend: 'none'
+		colorAxis: colorAxisObject
 	};
 	var chart = new google.visualization.GeoChart(document.getElementById('map_display'));
 	chart.draw(chartData, options);
