@@ -1,0 +1,7 @@
+PLUGIN ANNOTATIONS Wordpress Plugin
+By Mike Barklage
+http://www.mikebarklage.com
+
+To install, create a new /plugin-annotations folder in the {your WP filepath}/wp-content/plugins/ directory 
+and copy these files into it. Then activate it from the Plugins admin page.
+
