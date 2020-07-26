@@ -150,7 +150,7 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 	
 	if (whichMap == 'totalCases') {
 		// total cases - [-75%, 0%, +75%, 150%] pinned to [green, yellow, orange, red]
-		var colorAxisObject = {minValue: -75, maxValue: 150, colors: ['green', 'yellow', 'orange', 'red']};
+		var colorAxisObject = {minValue: -50, maxValue: 100, colors: ['green', 'yellow', 'orange', 'red']};
 	}
 	else {
 		// positive rate - [-2%, 0%, +2%] pinned to [green, yellow, red]
