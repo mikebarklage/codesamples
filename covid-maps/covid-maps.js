@@ -1,7 +1,8 @@
 var finalCaseDataArray;
 
 function initializeCovidMaps() {
-	var url = "https://covidtracking.com/api/v1/states/daily.json";
+	//var url = "https://covidtracking.com/api/v1/states/daily.json";
+	var url = "https://api.covidtracking.com/v1/states/daily.json";
 	
 	// get the raw data
 	$.get(url, function (data) {
@@ -35,7 +36,7 @@ function parseCovidCaseData(data, currentDate, previousDate) {
 	var stopDate = previousDate.addDays(-1).toString("yyyyMMdd");
 	
 	
-	// exclude some states that don't appear on the maps
+	// exclude some locations that don't appear on the maps
 	var excludeStates = ['AS', 'GU', 'MP', 'PR', 'VI', 'DC'];
 	
 	var caseData = {};
