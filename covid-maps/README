@@ -13,7 +13,7 @@ So I changed Total Cases to Weekly Cases and compared 7-day counts, now and X we
 
 9/4/2020 UPDATE:
 
-The daily US state data object has become pretty large, so I added a PHP script and set up a cron to download and preprocess it overnight. I'm also seeing intermittent JS errors from the google object, but I'm not yet sure what's wrong or how to fix it.
+The daily US state data object has become pretty large, so I added a PHP script and set up a cron to download and preprocess it overnight.
 
 I added this to crontab: 0 1 * * * php /home/mbarklage/mikebarklage.com/codesamples/covid-maps/processAPIdata.php
 
