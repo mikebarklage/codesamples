@@ -1,8 +1,12 @@
 var finalCaseDataArray;
 
 function initializeCovidMaps() {
+	// old API url:
 	//var url = "https://covidtracking.com/api/v1/states/daily.json";
-	var url = "https://api.covidtracking.com/v1/states/daily.json";
+	
+	// If you set up a nightly cron to curl the data, use the local URL, otherwise use the API directly
+	//var url = "https://api.covidtracking.com/v1/states/daily.json";
+	var url = "./daily.json";
 	
 	// get the raw data
 	$.get(url, function (data) {
@@ -154,8 +158,8 @@ function drawCovidMaps(finalCaseDataArray, whichMap) {
 		var colorAxisObject = {minValue: -50, maxValue: 100, colors: ['green', 'yellow', 'orange', 'red']};
 	}
 	else {
-		// positive rate - [-2%, 0%, +2%] pinned to [green, yellow, red]
-		var colorAxisObject = {minValue: -2, maxValue: 2, colors: ['green', 'yellow', 'red']};
+		// positive rate - [-1%, 0%, +1%] pinned to [green, yellow, red]
+		var colorAxisObject = {minValue: -1, maxValue: 1, colors: ['green', 'yellow', 'red']};
 	}
 
 	// create map
