@@ -57,23 +57,23 @@ function parseCovidCaseData(data, currentDate, previousDate) {
 				// add current data
 				if (currentDateArray.includes(val.date.toString())) {
 					// sum of a week's worth of data
-					caseData[val.state]['thisWeekCaseTotal'] += val.positiveIncrease;
+					caseData[val.state]['thisWeekCaseTotal'] += (val.positiveIncrease >= 0) ? val.positiveIncrease : 0;
 				}
 				if (currentDateArray[0] == val.date.toString()) {
 					// cumulative totals on this day
-					caseData[val.state]['thisWeekCaseOneDay'] = val.positive;
-					caseData[val.state]['thisWeekTestOneDay'] = val.totalTestResults;
+					caseData[val.state]['thisWeekCaseOneDay'] = (val.positive >= 0) ? val.positive : 0;
+					caseData[val.state]['thisWeekTestOneDay'] = (val.totalTestResults >= 0) ? val.totalTestResults : 0;
 				}
 				
 				// add past data
 				if (previousDateArray.includes(val.date.toString())) {
 					// sum of a week's worth of data
-					caseData[val.state]['lastWeekCaseTotal'] += val.positiveIncrease;
+					caseData[val.state]['lastWeekCaseTotal'] += (val.positiveIncrease >= 0) ? val.positiveIncrease : 0;
 				}
 				if (previousDateArray[0] == val.date.toString()) {
 					// cumulative totals on this day
-					caseData[val.state]['lastWeekCaseOneDay'] = val.positive;
-					caseData[val.state]['lastWeekTestOneDay'] = val.totalTestResults;
+					caseData[val.state]['lastWeekCaseOneDay'] = (val.positive >= 0) ? val.positive : 0;
+					caseData[val.state]['lastWeekTestOneDay'] = (val.totalTestResults >= 0) ? val.totalTestResults : 0;
 				}
 					
 			}
