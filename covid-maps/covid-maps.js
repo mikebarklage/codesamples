@@ -9,7 +9,7 @@ function initializeCovidMaps() {
 	var url = "./daily.json";
 	
 	// get the raw data
-	$.get(url, function (data) {
+	$.get({ url: url, cache: false}, function (data) {
 	
 		var thisWeekDate = new Date.today();
 		var lastWeekDate = new Date.today().addWeeks(-1 * weeksBack);
@@ -24,10 +24,6 @@ function initializeCovidMaps() {
 }
 
 function parseCovidCaseData(data, currentDate, previousDate) {
-	
-	// put current and past dates into string format
-	//var currentDate = thisDate.toString("yyyyMMdd");
-	//var previousDate = thisDate.addWeeks(weeks).toString("yyyyMMdd");
 	
 	var currentDateArray = new Array();
 	for (var x = 0; x <= 6; x++) {
@@ -44,7 +40,7 @@ function parseCovidCaseData(data, currentDate, previousDate) {
 	var excludeStates = ['AS', 'GU', 'MP', 'PR', 'VI', 'DC'];
 	
 	var caseData = {};
-	
+
 	// loop through the raw data
 	jQuery.each(data, function(i, val) {
 		
